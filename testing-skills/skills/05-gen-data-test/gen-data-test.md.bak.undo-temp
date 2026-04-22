@@ -1,0 +1,83 @@
+﻿---
+name: 05-gen-data-test
+version: 1.1.0
+preamble-tier: 2
+description: >
+  Tao bo du lieu kiem thu tu danh sach test case.
+  Ho tro 2 che do output:
+  - minimal: chi 1 file master dataset
+  - full: master dataset + coverage map + data-driven + teardown + manifest
+---
+
+## Quy tac luu output
+- Neu can ghi output ra file/thu muc, phai tu tao day du thu muc dich neu chua ton tai.
+
+## Quy tac ngon ngu
+- Noi dung output viet bang tieng Viet co dau.
+- Giu nguyen khong dau cho ma ky thuat: ID, endpoint, field name, status code, keyword he thong, ten file.
+
+## Dau vao
+- Danh sach test case (bat buoc)
+- Mo ta truong du lieu (type/constraint/format) (khuyen nghi)
+- Thong tin moi truong DB/API (khuyen nghi)
+- Yeu cau data sensitivity/PII (khuyen nghi)
+
+## Output mode (bat buoc)
+- Skill ho tro 2 che do:
+  - `minimal`: chi tao 1 file duy nhat la master dataset TSV
+  - `full`: tao day du artifact traceability
+- Thu tu uu tien xac dinh mode:
+  1. user chi dinh truc tiep (`minimal`/`full`)
+  2. `qa-config.yaml` co khoa `test_data.output_mode`
+  3. mac dinh = `minimal`
+- Neu user noi ro "chi can 1 file" thi bat buoc dung `minimal`.
+
+## Nguyen tac sinh data
+- Cu the, khong dung placeholder chung chung.
+- PII-safe, khong dung data that production.
+- Co BVA/EP khi test case yeu cau.
+- Data co the reset, khong phu thuoc thu tu chay.
+
+## Format output theo mode
+
+### Mode `minimal` (mac dinh)
+Tao duy nhat 1 file:
+```tsv
+TC_ID\tDataset_ID\tTen truong\tGia tri\tLoai\tGhi chu
+```
+Loai: `BVA-min` / `BVA-max` / `BVA-min-1` / `BVA-max+1` / `EP-valid` / `EP-invalid` / `Corner` / `Normal`
+
+### Mode `full`
+- Phan 1: Master dataset TSV
+- Phan 2: TC Coverage Map
+- Phan 3: Data-Driven table
+- Phan 4: Teardown script
+- Them manifest yaml ket qua run
+
+## Luu file vao
+Dung `output_paths.test_data` tu qa-config (mac dinh: `testing-output/test-data/`).
+
+- mode `minimal`:
+  - `master-dataset-{project.sprint}-v{semver}-{yyyy-mm-dd}_{HHmm}.tsv`
+
+- mode `full`:
+  - `master-dataset-{project.sprint}-v{semver}-{yyyy-mm-dd}_{HHmm}.tsv`
+  - `tc-coverage-map-{project.sprint}-v{semver}-{yyyy-mm-dd}_{HHmm}.tsv`
+  - `data-driven-table-{project.sprint}-v{semver}-{yyyy-mm-dd}_{HHmm}.tsv`
+  - `teardown-{project.sprint}-v{semver}-{yyyy-mm-dd}_{HHmm}.sql`
+  - `data-generation-result-{yyyy-mm-dd}_{HHmm}-R{N}.yaml`
+
+## Completion Status
+- `DONE`
+  - mode `minimal`: tao xong 1 file master dataset hop le, parse duoc theo TC.
+  - mode `full`: day du bo file theo quy dinh, khong thieu artifact bat buoc.
+- `DONE_WITH_CONCERNS`: co canh bao (thieu constraint, teardown chua map DB that, v.v.).
+- `BLOCKED`: thieu input toi thieu.
+- `NEEDS_CONTEXT`: can bo sung mo ta field/constraint/environment.
+
+## Checklist xac nhan luu file dung chuan
+- [ ] Da luu vao dung thu muc `testing-output/test-data/` hoac path override
+- [ ] Dung ten file theo mode da chon
+- [ ] mode `minimal`: chi con 1 file master dataset
+- [ ] mode `full`: du master + coverage + data-driven + teardown + manifest
+- [ ] Da kiem tra lai version, timestamp, sprint trong ten file

@@ -1,0 +1,234 @@
+# ============================================================
+# QA CONFIG — ShopEasy E-Commerce | Sprint-01
+# File mẫu có giá trị demo — copy thành qa-config.yaml rồi chỉnh lại theo dự án
+# Sinh tự động bởi skill 01.1 từ Test Plan
+# Dùng làm nguồn config chuẩn cho toàn bộ bộ skill; mỗi skill chỉ đọc các field liên quan khi cần
+# ============================================================
+
+project:
+  name: ShopEasy E-Commerce
+  code: SE                              # dùng làm prefix TC ID, bug ID
+  sprint: Sprint-01
+  domain: ecommerce
+  architecture: UI-web                  # api-only | UI-web | AI-based
+
+# ── TEAM ────────────────────────────────────────────────────
+# Dùng bởi: skill 01 (test plan), skill 08 (report), skill 09 (demo)
+team:
+  qc_lead: Nguyen Thi Lan
+  qc_engineers:
+    - Tran Van Minh
+    - Le Thi Thu
+  dev_lead: Pham Quoc Hung              # optional
+  pm: Bui Thanh Trang                   # optional
+
+# ── ENVIRONMENTS ────────────────────────────────────────────
+# Dùng bởi: skill 01, 06, 09, 10, 11, 12, 14
+environments:
+  staging:
+    url: https://staging.shopeasy.example.com
+    auth_required: true
+  uat:                                  # optional
+    url: https://uat.shopeasy.example.com
+    auth_required: true
+  production:                           # optional — chỉ dùng cho skill 14
+    url: https://www.shopeasy.example.com
+
+# ── TEST ACCOUNTS ───────────────────────────────────────────
+# Dùng bởi: skill 06, 09, 10, 12, 14
+# LƯU Ý: Không lưu password vào file này — dùng secrets manager hoặc .env
+test_accounts:
+  - role: admin
+    username: qa.admin@shopeasy.example.com
+    note: Tài khoản admin — có quyền quản lý đơn hàng, sản phẩm, người dùng
+  - role: user
+    username: qa.buyer@shopeasy.example.com
+    note: Tài khoản mua hàng thông thường — không có quyền quản trị
+  - role: readonly
+    username: qa.viewer@shopeasy.example.com
+    note: Chỉ xem báo cáo — không được sửa dữ liệu
+
+# ── TOOLS ───────────────────────────────────────────────────
+# Dùng bởi: skill 02, 03, 04, 06, 07, 08, 11
+tools:
+  test_management: qmetry               # qmetry | jira | testng | testlink | azure-devops | other
+  bug_tracker: jira
+  automation:
+    ui:
+      - robotframework
+    api:
+      - robotframework
+    performance: jmeter
+  communication:
+    channel: "#qa-shopeasy-sprint01"
+    escalation: "#qa-escalation"
+
+# ── SCOPE ───────────────────────────────────────────────────
+# Dùng bởi: skill 01, 02, 03, 04, 07, 15
+scope:
+  type: regression                      # regression | smoke | full
+  modules:
+    - Auth
+    - ProductCatalog
+    - Cart
+    - Checkout
+    - OrderManagement
+  exploratory_tier: Standard            # Quick | Standard | Exhaustive (mặc định: Standard)
+
+# ── EXIT CRITERIA ────────────────────────────────────────────
+# Dùng bởi: skill 07, 08, 13
+exit_criteria:
+  pass_rate: 95                         # % pass tối thiểu
+  health_score_baseline: 80             # /100
+  max_s1_open: 0                        # không được có S1 nào còn mở
+  max_s2_open: 3
+  tc_executed_rate: 100                 # % TC phải chạy xong
+
+# ── SUSPENSION CRITERIA ──────────────────────────────────────
+# Dùng bởi: skill 07, 13
+suspension_criteria:
+  blocked_tc_rate: 30                   # % TC bị blocked thì tạm dừng
+  env_down_hours: 4                     # giờ môi trường down thì tạm dừng
+
+# ── PERFORMANCE BASELINE ─────────────────────────────────────
+# Dùng bởi: skill 11, 13, 14
+# Ghi đè lên defaults trong references/performance-baseline.md
+performance:
+  concurrent_users_normal: 500
+  concurrent_users_peak: 2000
+  api_p95_ms: 800                       # ngưỡng P95 response time (ms)
+  api_error_rate_threshold: 1           # % error rate tối đa
+  page_load_lcp_s: 2.5                  # LCP tối đa (giây)
+  rollback_error_rate: 5                # % error rate trigger rollback sau deploy
+
+# ── SECURITY ────────────────────────────────────────────────
+# Dùng bởi: skill 10
+security:
+  focus:                                # danh sách OWASP category ưu tiên
+    - A01                               # Broken Access Control
+    - A03                               # Injection
+    - A07                               # Identification and Authentication Failures
+  # Nếu trống, skill 10 sẽ kiểm tra toàn bộ OWASP Top 10
+
+# ── ACCESSIBILITY ────────────────────────────────────────────
+# Dùng bởi: skill 15, 13
+accessibility:
+  required: true
+  wcag_level: AA                        # AA | AAA (mặc định: AA)
+  lighthouse_score_min: 80              # mặc định: 80
+
+# ── UAT ─────────────────────────────────────────────────────
+# Dùng bởi: skill 12, 13
+uat:
+  required: true
+  stakeholders:
+    - name: Nguyen Van A
+      role: Product Owner
+      department: Product
+    - name: Tran Thi B
+      role: Business Analyst
+      department: Business
+    - name: Le Van C
+      role: End User
+      department: Sales
+
+# ── CRITICAL USER JOURNEYS ───────────────────────────────────
+# Dùng bởi: skill 14 (smoke test production)
+# Liệt kê 5–10 luồng quan trọng nhất — nếu hỏng thì phải rollback
+critical_user_journeys:
+  - name: login
+    description: Người dùng đăng nhập bằng email và password, nhận token thành công
+  - name: search-product
+    description: Người dùng tìm kiếm sản phẩm theo keyword, xem kết quả và chi tiết sản phẩm
+  - name: add-to-cart
+    description: Người dùng thêm sản phẩm vào giỏ hàng, kiểm tra tổng tiền cập nhật đúng
+  - name: checkout-cod
+    description: Người dùng hoàn tất đặt hàng COD, nhận email xác nhận đơn hàng
+  - name: order-tracking
+    description: Người dùng tra cứu trạng thái đơn hàng theo mã đơn
+
+# ── DEFINITION OF DONE ──────────────────────────────────────
+# Dùng bởi: skill 08, 13
+definition_of_done:
+  - TC viết xong và đã review
+  - Pass rate >= 95%
+  - Không còn S1 open
+  - Không còn S2 open > 3
+  - Sprint report gửi stakeholder
+
+# ── OUTPUT PATHS (optional) ──────────────────────────────────
+# Ghi đè default path của từng skill — bỏ section này nếu dùng cấu trúc thư mục mặc định
+# Dùng bởi: tất cả skill khi lưu output
+output_paths:
+  root: ~                               # default: testing-output/
+  test_plan: ~                          # default: testing-output/test-plan/
+  test_cases:
+    hltc: ~                             # default: testing-output/test-cases/hltc/
+    functional: ~                       # default: testing-output/test-cases/functional/
+    sit: ~                              # default: testing-output/test-cases/sit/
+    regression: ~                       # default: testing-output/test-cases/regression/
+  test_data: ~                          # default: testing-output/test-data/
+  automation: ~                         # default: testing-output/automation/
+  demo: ~                               # default: testing-output/demo/
+  reports:
+    root: ~                             # default: testing-output/reports/
+    daily: ~                            # default: testing-output/reports/daily/
+    sprint: ~                           # default: testing-output/reports/sprint/
+    security: ~                         # default: testing-output/reports/security/
+    performance: ~                      # default: testing-output/reports/performance/
+    accessibility: ~                    # default: testing-output/reports/accessibility/
+
+# ── ARTIFACT TRACEABILITY (optional) ───────────────────────
+# Dùng bởi: skill 05, 07, 08
+artifact_traceability:
+  require_version_in_filename: true
+  require_timestamp_in_filename: true
+  require_result_manifest: true
+  version_scheme: semver
+  result_status:
+    - SUCCESS
+    - PARTIAL
+    - FAILED
+    - BLOCKED
+  manifests:
+    data_generation: ~                  # default: testing-output/test-data/
+    test_run: ~                         # default: testing-output/reports/daily/
+
+# ── AUTOMATION RULES (optional) ───────────────────────────
+# Dùng bởi: skill 06 (gen script), skill 04 (review), skill 08 (report)
+automation_rules:
+  framework_primary: robotframework
+  ui_engine: browser-playwright         # browser-playwright | selenium
+  architecture:
+    model: 4-layer
+    enforce_no_sql_in_testcase: true
+    enforce_no_business_assert_in_low_level: true
+  generation:
+    require_mapping_matrix: true
+    require_dod_checklist: true
+  data_strategy:
+    no_hardcode_sensitive_data: true
+    file_types:
+      - csv
+      - json
+      - yaml
+  test_level_policy:
+    levels:
+      - component
+      - integration
+      - e2e
+    unit_test_in_scope: false
+    target_mix_percent:
+      component: 30
+      integration: 50
+      e2e: 20
+    mapping_rules:
+      functional_default: e2e
+      sit_default: integration
+      functional_with_external_dependency: e2e
+      functional_single_screen_or_single_endpoint: component
+      sit_multi_service_sync: integration
+      sit_end_to_end_customer_journey: e2e
+    output_convention:
+      embed_test_level_in_tc_summary: true
+      summary_prefix_format: "[TL:{level}]"
